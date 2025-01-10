@@ -37,8 +37,7 @@ coverage
 bower_components
 
 # node-waf configuration
-.lock-wscript
-
+.lock-
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
@@ -142,3 +141,4 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+node_modules
