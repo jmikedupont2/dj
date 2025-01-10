@@ -1,0 +1,135 @@
+.dungeon-app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.controls-section {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 300px;
+    flex: 1;
+}
+
+.control-group label {
+    width: 120px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.control-group select,
+.control-group input[type="text"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    flex: 1;
+    min-width: 150px;
+}
+
+.control-group input[type="checkbox"] {
+    margin: 0;
+}
+
+.action-bar {
+    background: #e0e0e0;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.dungeon-name {
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dungeon-name input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+    width: 300px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button {
+    padding: 5px 15px;
+    background: #fff;
+    border: 1px solid #999;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 100px;
+}
+
+.action-button:hover {
+    background: #f0f0f0;
+}
+
+.dungeon-canvas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-wrapper {
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.dungeon-canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.export-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.export-button:hover {
+    background-color: #0056b3;
+}

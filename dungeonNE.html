@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Random Dungeon Generator v1.0.4</title>
+  <script type="text/javascript">
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // this is a completely self-contained random dungeon generator,
+    // implemented in HTML5 and JavaScript.
+    //
+    //   version 1.0.4a      refactored into ts compiled to js - this one uses unbundled for debugging
+    //   version 1.0.4      es2015 updates
+    //   version 1.0.3      updated save_canvas to use filename
+    //   version 1.0.2      linked to generator.js version 2.0
+    //   version 1.0.1      cache set_pixel() for performance
+    //   version 1.0        initial release
+    //
+    // written by drow [drow@bin.sh]
+    // http://creativecommons.org/licenses/by-nc/3.0/
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  </script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="reworkedJsSrc/canvas.js"></script>
+  <script src="reworkedJsSrc/dice.js"></script>
+  <script src="reworkedJsSrc/dungeon.js"></script>
+  <script src="reworkedJsSrc/gen_data.js"></script>
+  <script src="reworkedJsSrc/generator.js"></script>
+  <script src="reworkedJsSrc/name.js"></script>
+  <script src="reworkedJsSrc/name_set.js"></script>
+  <script src="reworkedJsSrc/prng.js"></script>
+  <!-- <script src="dist/bundle.js"></script>
+  -->
+  <link rel="stylesheet" href="styles/dungeon.css">
+
+  <!-- <link rel="stylesheet"
+    href="data:text/css;base64,LyogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKi8KLyogZHVuZ2Vvbi5jc3MgKi8KCi8qICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICovCi8qIHN0cnVjdHVyZSAqLwoKYm9keSB7IG1hcmdpbjogMHB4OyBwYWRkaW5nOiAwcHg7CiAgZm9udC1mYW1pbHk6ICdBc3VsJywgc2Fucy1zZXJpZjsgZm9udC1zaXplOiAxNHB4OyB9CgovKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqLwovKiBjb21tb24gKi8KCmgxIHsgdGV4dC1hbGlnbjogY2VudGVyOyBmb250LXNpemU6IDE1MCU7IGZvbnQtd2VpZ2h0OiBib2xkOyB9Cgpmb3JtIHsgbWFyZ2luOiAyZXggMmVtOyBwYWRkaW5nOiAwcHg7IH0KaW5wdXQgeyBtYXJnaW4tcmlnaHQ6IDAuNWVtOyBwYWRkaW5nOiAwLjVleCAwLjVlbTsKICBmb250LWZhbWlseTogTW9uYWNvLCBtb25vc3BhY2U7IGZvbnQtc2l6ZTogMTFweDsgfQpzZWxlY3QgeyBtaW4td2lkdGg6IDEwZW07IG1hcmdpbi1yaWdodDogMC41ZW07IGZvbnQtc2l6ZTogMTFweDsgfQoKdGFibGUgeyBtYXJnaW46IDBweCAyZW07IGJvcmRlcjogbm9uZTsgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsgfQp0ZCB7IHBhZGRpbmc6IDAuNWV4IDAuNWVtOyB0ZXh0LWFsaWduOiBsZWZ0OyB2ZXJ0aWNhbC1hbGlnbjogdG9wOyB9CnRkLmtleSB7IHRleHQtYWxpZ246IHJpZ2h0OyBmb250LXdlaWdodDogYm9sZDsgfQoKY2FudmFzIHsgbWFyZ2luOiAyZXggYXV0bzsgfQoKLmNlbnRlciB7IHRleHQtYWxpZ246IGNlbnRlcjsgfQp0YWJsZS5jZW50ZXIgeyBtYXJnaW4tbGVmdDogYXV0bzsgbWFyZ2luLXJpZ2h0OiBhdXRvOyB9CgovKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqLwovKiBzY3JlZW4gKi8KCkBtZWRpYSBzY3JlZW4gewogIGgxLnRpdGxlIHsgZGlzcGxheTogbm9uZTsgfQogIGZvcm0geyBkaXNwbGF5OiBibG9jazsgfQp9CgovKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqLwovKiBwcmludCAqLwoKQG1lZGlhIHByaW50IHsKICBoMS50aXRsZSB7IGRpc3BsYXk6IGJsb2NrOyB9CiAgZm9ybSB7IGRpc3BsYXk6IG5vbmU7IH0KfQoKLyogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKiAqICogKi8K" /> -->
+</head>
+
+<body>
+  <form class="scripted">
+    <h1>Random Dungeon Generator</h1>
+    <table id="form" class="center">
+      <tr>
+        <td class="key">Dungeon Name:</td>
+        <td colspan="5" class="value"><input id="dungeon_name" size="60" /> &nbsp; <input type="button" id="new_name"
+            value="New" /> </td>
+      </tr>
+      <tr>
+        <td class="key">Map Style:</td>
+        <td class="value"><select id="map_style"></select></td>
+        <td class="key">Grid:</td>
+        <td class="value"><select id="grid"></select></td>
+      </tr>
+      <tr>
+        <td class="key">Dungeon Layout:</td>
+        <td class="value"><select id="dungeon_layout"></select></td>
+        <td class="key">Size:</td>
+        <td class="value"><select id="dungeon_size"></select></td>
+        <td class="key">Stairs?</td>
+        <td class="value"><select id="add_stairs"></select></td>
+      </tr>
+      <tr>
+        <td class="key">Room Layout:</td>
+        <td class="value"><select id="room_layout"></select></td>
+        <td class="key">Size:</td>
+        <td class="value"><select id="room_size"></select></td>
+        <td class="key">Doors:</td>
+        <td class="value"><select id="doors"></select></td>
+      </tr>
+      <tr>
+        <td class="key">Corridors:</td>
+        <td class="value"><select id="corridor_layout"></select></td>
+        <td class="key">Trim?</td>
+        <td class="value"><select id="remove_deadends"></select></td>
+      </tr>
+      <tr>
+        <td colspan="6"></td>
+      </tr>
+      <tr>
+        <td colspan="6" class="center" style="background: #dedede;">
+          <input id="save_map" type="button" value="Save as PNG" />
+          &nbsp; <input id="print_map" type="button" value="Print" />
+        </td>
+      </tr>
+    </table>
+  </form>
+  <div class="center">
+    <h1 id="dungeon_title" class="title"></h1>
+    <canvas id="map" width="1" height="1">
+      <p>Your web browser does not appear to support the HTML5 &lt;canvas&gt; element.</p>
+    </canvas>
+    <p><img
+        src="data:image/gif;base64,R0lGODlhHAIfAMQAAIqJiry8vEdFR2hnaO7u7t7d3hUTFZuamyUkJaurq83MzTY1NlhWWHl4eczOzPz+/AQCBP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAcAh8AAAX/oAONZGmOTqSubOu+cCzPrXjeZErvfO/buJvORywWgUHT0MhswpDJnHNKVUGjkGV1+8MqueCuVxouz65RrXm9QifV7LU7CI+X57i6HYwX7u19J3p/VYFfhHJjZIh3iiiMZoYlg5BMkouVW5ePmVybWZ2ejqChhaOUpTyfqKk0q61Tr7BNsrNGtbZEuLk9u7w7vr9np8JiiqzFVsTJwMvMw47IyQ7U1dQ51tXPrtnXKN3SxeBA49tn4Njd5jLj6dnrMe3f6vAvDg/4+Q8k+vnhwvf67Rsh8MG/XwH78RN4kFdCfQv7Ncz1MF9EfRNtVcR30V89ewU74ss4a+NACAVJ/8IyKdLgRxcsCTJ8WSOkTIk0WcREOTOnFZs8cfqMsDPlUKJAjQ4t2tMnU6FOkzbNabKgx6UQcWA8+jDIVqwWtV6NGtKqylZVrboEq3Yqza5lx1KFaLGu3Ld0BQZdS1ahyLOpqu792rctYRcAEuxQ0CAUXL2HIwiYLGBAgG2P99kd2UJAEc89QHvKqzByhAaUJzeOc+AALciD7wZYMIIBgSoKCrBJa7YzZQaXaSje0VpyBMaFDLtdQWDBgh0BRFfKTJqvCggBsh8wMHwa6aB7tUAoMr5H+dGbq6tRkB17AAV2AAB4XTo2Z+YILhNAXUVA8EhW2WddBO4FsJ1uMkTHg/98BEZAAHxU8KYUYgcMAGEBCQzAQAEKDCDAfNEdUBmEiFCXnngsKICACgEwIIBrDgJQmW4YaoggIZmBF9l5K7T4ogr7VXZbeQnMR4CMAyDYoQAJ8JhceifGcF6NGy7JAHwH+DgcANFdqUIBHgJwWwRINjCfJbD11qN0Z4L54ZgJuKhYAHEOEIGPrgWAQJJyKAfVdSyYGYGbYt5Z5wAIuLbkfAXASCaZ843XqAoyenmEn6apgAABGbIIAQAHEGAAlwtwCYFlAzzHiIkc7djCAuwZcEACpUoGHAAGEBDAp47i+F2ULDgZgKy0zldZAB42uB18DNyaq6iJ0RZGQF7c98L/ebuCCm0AAKwoQKIJGHAZBEziSgABCHCZLAALcPspfX7Zt4SoAyQwpoPpIuvZsAmEyy13CSgg62xc7nnjtAGquQKPA4g5qo9kAoxoqA+XqiCgDI6n4AHtdnsLpnexaGcEC9w2mwoVfpndioCuWh2wC3eGLIwFIFDzCgNkqSokOcLcMs4028xyBK5BsOygQ+ec8qBORvhyqyHHzKKqnH453oco2wkBhEqPHIHQCDYMb31uKcCAARB4ufTXYMIYQAEArJbzl97+dwfI1l4nHwCIErC2zXGz6NnSBWQn2ngZ3+mZjPAd3AveA6qA6GSyKk7pmYJLXeLTmt3lZLv+LXwx/6Sju7yZjp7LLLp0BBqQ650m7K25JpyHJ+WaK8gIAQJXB6fgeXubsGvumF9aVmx1dJgrAMKHTrwKApggmd0Ix+XWp/KFCukK/jFoufeZYxyp5QQwsHvxj+OthqjZGfjcxYGjPHrTgNTu6goFGBABA8Plr8DODSvd5k7nswaxgH9fMsD/VmCvrfHtODvTTfwIQD8nsKpzeWsBtkDDseBcbThxItCYzBS/QUXgdadB3w8ShjwWHKB4HVuNCRE4KG6diYYmdB6A1KdBxMgQAQrwnoJKmKXDbU9jnjmX3xRoPJCpoYQkYw9o8ncZGc2PZ/ZLnQr+Nx+OFYAAA7BTuu5kgP/Csc5XBIRaBp3kRTCKEUS5Kk+7vsao/NTsMgOo4NjsYzsYbJBSDHBQHiVTsgIsQDGnupPNqEjG/QzgQaMaG0dasgSBXShXjByW3xbwRQbIjmicJJNnmLSbhE3oZ/gTF5lWJMTnMJJxZTwN4sanoDDii0Tpc6ILgMgCvo0uAbwTgBRn94euiGWNJBgjpdD2yONEDwFzOmMxs3KDHZWgisy8jQKeiUgWbWqbEIhkBIAJgQboEU1hqWbUfnYxAkTPAA0oY2Vcd6Zy7g6EvIOmIHfnSUlC6S7boRyMyKnPiJ3qSJjDFbngw7xe8QFyKHIBOYW5PXytaKLwiaesZtkgBbnkM5wqBIZU/oQXvdwkU/V4CkrhodJ1+kCHqKyfSeX1guzcixktzeBLchq5j/AUMKX4KVdGutLQUO+c1YvXKUuq1OX4lKguXYdQ2ULNpe4UqjotwgEcF9I+zdSqT/2qU1OKjnm8YyllzQI4uJLWcqC1G+6wBlvhala5vjUbcdXGUpxBFb6+xa87BaxPBZtSwrLUsFJFrDmCUdhocEWxmIHsMxh7WMfu1bJOkSxONTsNzorDswABLUJE6xDSUsS0GkFtSVS7EtaixbWBgW1QZesY2naCsonFbF91+1feBta3gwVuPUIAADs="
+        alt="" /></p>
+    <p>Random Dungeon Generator<br />http://donjon.bin.sh/</p>
+  </div>
+  <div id="debug"></div>
+</body>
+
+</html>
